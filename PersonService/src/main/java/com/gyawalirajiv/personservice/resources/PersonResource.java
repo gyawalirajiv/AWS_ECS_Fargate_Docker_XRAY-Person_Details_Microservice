@@ -13,7 +13,7 @@ import java.util.List;
 public class PersonResource {
 
     @Autowired
-    PersonService personService;
+    private PersonService personService;
 
     /**
      * A POST mapping that creates a Person with their Person Details
@@ -42,7 +42,7 @@ public class PersonResource {
      * @return a DTO of the specified Person Entity
      */
     @GetMapping("/person/{id}")
-    public PersonDTO getPerson(@PathVariable Long id){
+    public Person getPerson(@PathVariable Long id){
         return personService.getPerson(id);
     }
 
@@ -52,7 +52,7 @@ public class PersonResource {
      * @return a List of Person without Person Details
      */
     @GetMapping("/person")
-    public List<PersonDTO> getAllPeople(){
+    public List<Person> getAllPeople(){
         return personService.getAll();
     }
 

@@ -21,6 +21,6 @@ public class Person {
     private String name;
     private Integer age;
 
-    @OneToOne(mappedBy = "person", fetch = FetchType.LAZY)
+    @Transient
     private PersonDetails personDetails;
 }

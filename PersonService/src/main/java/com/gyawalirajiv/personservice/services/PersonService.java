@@ -1,19 +1,15 @@
 package com.gyawalirajiv.personservice.services;
 
-import com.gyawalirajiv.personservice.dtos.PersonDTO;
-import com.gyawalirajiv.personservice.dtos.PersonDetailsDTO;
 import com.gyawalirajiv.personservice.models.Person;
 import com.gyawalirajiv.personservice.models.PersonDetails;
-import com.gyawalirajiv.personservice.repository.PersonDetailsRepository;
 import com.gyawalirajiv.personservice.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PersonService {
@@ -22,38 +18,32 @@ public class PersonService {
     private PersonRepository personRepository;
 
     @Autowired
-    private PersonDetailsRepository personDetailsRepository;
+    private RestTemplate restTemplate;
 
-    public PersonDTO getPerson(Long id) {
+    @Value("${person.details.service.uri}")
+    private String personDetailsServiceURI;
+
+    public Person getPerson(Long id) {
         Person person = personRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("No such Person exists!"));
-        PersonDetails personDetails = person.getPersonDetails();
+        PersonDetails personDetails = restTemplate.getForObject(personDetailsServiceURI + "/api/personDetails/" + person.getId(), PersonDetails.class);
 
-        PersonDTO personDTO = new PersonDTO(
-                person.getId(),
-                person.getName(),
-                person.getAge(),
-                new PersonDetailsDTO(
-                        personDetails.getId(),
-                        personDetails.getPhoneNumber(),
-                        personDetails.getAddress()
-                ));
-        return personDTO;
+        person.setPersonDetails(personDetails);
+        return person;
     }
 
     @Transactional
     public Person save(Person person) {
-        PersonDetails personDetails = person.getPersonDetails();
         person = personRepository.save(person);
-        personDetails.setPerson(person);
-        personDetailsRepository.save(personDetails);
+        PersonDetails personDetails = person.getPersonDetails();
+        personDetails.setPersonId(person.getId());
+
+        personDetails = restTemplate.postForObject(personDetailsServiceURI + "/api/personDetails", personDetails, PersonDetails.class);
+        person.setPersonDetails(personDetails);
         return person;
     }
 
-    public List<PersonDTO> getAll() {
-        List<Person> personList = personRepository.findAll();
-        return personList.stream()
-                .map(person -> new PersonDTO(person.getId(), person.getName(), person.getAge(), null))
-                .collect(Collectors.toList());
+    public List<Person> getAll() {
+        return personRepository.findAll();
     }
 }
