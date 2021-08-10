@@ -1,5 +1,6 @@
 package com.gyawalirajiv.personservice.resources;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.gyawalirajiv.personservice.dtos.PersonDTO;
 import com.gyawalirajiv.personservice.models.Person;
 import com.gyawalirajiv.personservice.services.PersonService;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@XRayEnabled
 @RequestMapping("/api")
 public class PersonResource {
 

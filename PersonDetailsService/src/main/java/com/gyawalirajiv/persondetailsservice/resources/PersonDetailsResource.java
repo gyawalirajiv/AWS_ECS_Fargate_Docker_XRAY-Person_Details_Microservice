@@ -1,11 +1,13 @@
 package com.gyawalirajiv.persondetailsservice.resources;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import com.gyawalirajiv.persondetailsservice.models.PersonDetails;
 import com.gyawalirajiv.persondetailsservice.services.PersonDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@XRayEnabled
 @RequestMapping("/api")
 public class PersonDetailsResource {
 
